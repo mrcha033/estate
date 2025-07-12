@@ -3,9 +3,19 @@ from sqlalchemy import create_engine, text
 import logging
 import hashlib
 import json
+import sentry_sdk
+import os
 
-# Configure logging
+# Configure main logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Configure a dedicated logger for ETL alerts
+etl_alert_logger = logging.getLogger('etl_alerts')
+etl_alert_logger.setLevel(logging.ERROR)
+alert_handler = logging.FileHandler('etl_alerts.log')
+alert_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+alert_handler.setFormatter(alert_formatter)
+etl_alert_logger.addHandler(alert_handler)
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=300) # Retry after 5 minutes
 def fetch_data_from_api(self, api_url):
@@ -19,9 +29,13 @@ def fetch_data_from_api(self, api_url):
         return {"message": f"Data fetched from {api_url}", "data": []}
     except ConnectionError as e:
         logging.error(f"Connection error fetching data from {api_url}: {e}")
+        sentry_sdk.capture_exception(e)
+        etl_alert_logger.error(f"ETL Alert: Connection error in fetch_data_from_api for {api_url}: {e}")
         raise self.retry(exc=e)
     except Exception as e:
         logging.error(f"An unexpected error occurred during data fetching from {api_url}: {e}")
+        sentry_sdk.capture_exception(e)
+        etl_alert_logger.error(f"ETL Alert: Unexpected error in fetch_data_from_api for {api_url}: {e}")
         raise self.retry(exc=e)
 
 @shared_task
@@ -33,6 +47,8 @@ def normalize_data(raw_data):
         return {"message": f"Data normalized: {raw_data}", "normalized_data": raw_data}
     except Exception as e:
         logging.error(f"An error occurred during data normalization: {e}")
+        sentry_sdk.capture_exception(e)
+        etl_alert_logger.error(f"ETL Alert: Error during data normalization: {e}")
         raise
 
 @shared_task
@@ -44,6 +60,8 @@ def deduplicate_records(normalized_data):
         return {"message": f"Data deduplicated: {normalized_data}", "deduplicated_data": normalized_data}
     except Exception as e:
         logging.error(f"An error occurred during data deduplication: {e}")
+        sentry_sdk.capture_exception(e)
+        etl_alert_logger.error(f"ETL Alert: Error during data deduplication: {e}")
         raise
 
 @shared_task
@@ -59,6 +77,8 @@ def store_data_in_postgresql(deduplicated_data):
         return {"message": f"Data stored in PostgreSQL: {deduplicated_data}"}
     except Exception as e:
         logging.error(f"An error occurred during data storage in PostgreSQL: {e}")
+        sentry_sdk.capture_exception(e)
+        etl_alert_logger.error(f"ETL Alert: Error during data storage in PostgreSQL: {e}")
         raise
 
 @shared_task
@@ -83,4 +103,29 @@ def add_checksum_and_audit_log(data):
         return {"message": "Checksum calculated and audit log entry created", "checksum": checksum, "audit_log": audit_log_entry}
     except Exception as e:
         logging.error(f"An error occurred during checksum calculation or audit logging: {e}")
+        sentry_sdk.capture_exception(e)
+        etl_alert_logger.error(f"ETL Alert: Error during checksum calculation or audit logging: {e}")
         raise
+
+@shared_task
+def send_daily_etl_summary_email():
+    log_file_path = 'etl_alerts.log'
+    summary = "Daily ETL Log Summary:\n\n"
+    if os.path.exists(log_file_path):
+        with open(log_file_path, 'r') as f:
+            lines = f.readlines()
+            if not lines:
+                summary += "No errors logged today."
+            else:
+                summary += "Errors logged today:\n"
+                for line in lines:
+                    summary += f"- {line.strip()}\n"
+        # Clear the log file after reading
+        open(log_file_path, 'w').close()
+    else:
+        summary += "ETL alert log file not found."
+
+    # In a real scenario, you would send this summary via email or Slack.
+    # For now, we'll just log it.
+    logging.info(summary)
+    # TODO: Call backend endpoint to send email

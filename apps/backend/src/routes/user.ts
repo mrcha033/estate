@@ -3,6 +3,9 @@ import { supabase } from '../lib/supabase'
 import { generateToken, verifyToken } from '../lib/jwt'
 import redisClient from '../lib/redis'
 import { encrypt, decrypt } from '../lib/encryption'
+import { sendEmail } from '../lib/ses'
+import { prisma } from '../lib/prisma'
+import { getAnalytics } from '../lib/segment'
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -30,6 +33,26 @@ export async function userRoutes (fastify: FastifyInstance) {
     if (error) {
       return reply.code(400).send({ message: error.message })
     }
+
+    // Track user signup event
+    const analytics = getAnalytics();
+    if (data.user) {
+      analytics?.track('User Signed Up', {
+        userId: data.user.id,
+      });
+    }
+
+    // Mark beta invitation as used if it exists
+    try {
+      await prisma.betaInvitation.update({
+        where: { email: email },
+        data: { used: true, usedAt: new Date() },
+      });
+    } catch (prismaError) {
+      // Log the error but don't block signup if invitation not found or already used
+      console.warn(`Could not update beta invitation for ${email}:`, prismaError);
+    }
+
     return { user: data.user }
   })
 
@@ -51,6 +74,12 @@ export async function userRoutes (fastify: FastifyInstance) {
     if (!user || !session) {
       return reply.code(500).send({ message: 'Authentication failed' });
     }
+
+    // Track user login event
+    const analytics = getAnalytics();
+    analytics?.track('User Logged In', {
+      userId: user.id,
+    });
 
     // Assign a default role, e.g., 'user'
     const userRole = 'user'; 
@@ -183,4 +212,29 @@ export async function userRoutes (fastify: FastifyInstance) {
     const deletedUser = users.splice(userIndex, 1)
     return { message: 'User deleted', user: { ...deletedUser[0], email: decrypt(deletedUser[0].email) } }
   })
+
+  // Submit a support request
+  fastify.post('/support', async (request, reply) => {
+    const { name, email, message } = request.body as { name: string; email: string; message: string };
+
+    if (!name || !email || !message) {
+      return reply.code(400).send({ message: 'Name, email, and message are required' });
+    }
+
+    const subject = `Support Request from ${name} (${email})`;
+    const body = `
+      <p><strong>Name:</strong> ${name}</p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p><strong>Message:</strong></p>
+      <p>${message}</p>
+    `;
+
+    try {
+      await sendEmail('support@estate.com', subject, body); // Send to a predefined support email
+      return reply.code(200).send({ message: 'Support request submitted successfully' });
+    } catch (error) {
+      console.error('Error sending support email:', error);
+      return reply.code(500).send({ message: 'Failed to submit support request' });
+    }
+  });
 }

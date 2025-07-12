@@ -1,7 +1,14 @@
 import SimpleLineChart from '@/components/SimpleLineChart';
 import SimpleBarChart from '@/components/SimpleBarChart';
+import { useEffect } from 'react';
+import { getAnalytics } from '../../lib/segment';
 
 export default function ReportsPage() {
+  useEffect(() => {
+    const analytics = getAnalytics();
+    analytics?.track('Report Opened');
+  }, []);
+
   const lineChartData = [
     { name: 'Jan', value: 4000 },
     { name: 'Feb', value: 3000 },

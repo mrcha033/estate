@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 import SearchFilter from '@/components/SearchFilter';
+import { getAnalytics } from '../../lib/segment';
 
 const LazyLoadedComponent = dynamic(() => import('@/components/LazyLoadedComponent'), {
   ssr: false,
@@ -9,6 +10,8 @@ const LazyLoadedComponent = dynamic(() => import('@/components/LazyLoadedCompone
 export default function SearchPage() {
   const handleSearch = (filters: any) => {
     console.log('Search filters:', filters);
+    const analytics = getAnalytics();
+    analytics?.track('Product Search', filters);
     // In a real application, you would use these filters to call a backend API
   };
 
