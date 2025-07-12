@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "vooster-ai": {
+      "command": "cmd.exe",
+      "args": [
+        "/c",
+        "npx",
+        "-y",
+        "--package=@vooster/mcp@latest",
+        "vooster-ai",
+        "--api-key=ak_ybc6ci77h9h6tr5o0cyqzbw8"
+      ]
+    }
+  }
+}

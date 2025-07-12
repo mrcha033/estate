@@ -1,0 +1,27 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model UserPreference {
+  id            String   @id @default(cuid())
+  userId        String   @unique
+  favorites     String[] @default([])
+  searchHistory String[] @default([])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Subscription {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  frequency String
+  consent   Boolean
+  verified  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
