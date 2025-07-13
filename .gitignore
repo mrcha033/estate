@@ -3,3 +3,11 @@
 
 # node_modules
 node_modules/
+
+# venv
+venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
