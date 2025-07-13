@@ -2,6 +2,7 @@ import os
 import sentry_sdk
 from celery import Celery
 from celery.schedules import crontab
+from prometheus_client import start_http_server
 
 sentry_sdk.init(
     dsn=os.environ.get("SENTRY_DSN"),
@@ -28,6 +29,9 @@ app.conf.beat_schedule = {
     },
 }
 app.conf.timezone = 'UTC'
+
+# Start up the server to expose the metrics.
+start_http_server(8000)
 
 @app.task
 def process_data(data):

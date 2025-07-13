@@ -1,11 +1,21 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
+import { FastifyInstance } from 'fastify';
+import { PrismaClient } from '@prisma/client';
 
-export async function reportsRoutes (fastify: FastifyInstance) {
-  fastify.get('/reports', async (request: FastifyRequest, reply: FastifyReply) => {
-    if (!request.user) {
-      return reply.code(401).send({ message: 'Unauthorized' });
+const prisma = new PrismaClient();
+
+export default async function (fastify: FastifyInstance) {
+  fastify.get('/api/reports', async (request, reply) => {
+    try {
+      const reports = await prisma.report.findMany({
+        orderBy: {
+          createdAt: 'desc',
+        },
+        take: 2,
+      });
+      reply.send(reports);
+    } catch (error) {
+      fastify.log.error(error);
+      reply.status(500).send({ error: 'Failed to fetch reports' });
     }
-    // Placeholder for reports data
-    return { reports: [] } 
-  })
+  });
 }

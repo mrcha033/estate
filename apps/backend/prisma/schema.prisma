@@ -34,3 +34,12 @@ model BetaInvitation {
   usedAt    DateTime?
   createdAt DateTime @default(now())
 }
+
+model Report {
+  id          String   @id @default(cuid())
+  summary     String
+  model_hash  String
+  prompt_hash String
+  s3_url      String
+  createdAt   DateTime @default(now())
+}
