@@ -1,4 +1,5 @@
+celery==5.3.6
 sentry-sdk
 prometheus_client
-celery
-SQLAlchemy
+SQLAlchemy==2.0.30
+python-dotenv
