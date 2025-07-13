@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
+import { getSecrets } from './secrets';
 
-const JWT_SECRET: string = process.env.JWT_SECRET || 'supersecretjwtkey';
+const JWT_SECRET: string = getSecrets().JWT_SECRET || 'supersecretjwtkey';
 
 export const generateToken = (payload: string | object | Buffer, expiresIn: string): string => {
   return jwt.sign(payload, JWT_SECRET, { 

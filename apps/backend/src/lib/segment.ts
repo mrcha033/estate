@@ -1,6 +1,7 @@
 import { Analytics } from '@segment/analytics-node';
+import { getSecrets } from './secrets';
 
-const SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY || '';
+const SEGMENT_WRITE_KEY = getSecrets().SEGMENT_WRITE_KEY || '';
 
 let analytics: Analytics | null = null;
 

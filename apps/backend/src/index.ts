@@ -10,6 +10,7 @@ import { subscriptionRoutes } from './routes/subscriptions'
 import { dataQARoutes } from './routes/data_qa'
 import { authPlugin } from './plugins/auth'
 import { metricsPlugin } from './plugins/metrics'
+import { loadSecrets } from './lib/secrets'
 
 const fastify = Fastify({
   logger: true
@@ -32,6 +33,7 @@ fastify.get('/', async (request, reply) => {
 })
 
 const start = async () => {
+  await loadSecrets();
   try {
     await fastify.listen({ port: 3000 })
   } catch (err) {
