@@ -33,5 +33,5 @@ jobs:
         working-directory: services/ai
 
       - name: Run tests
-        run: python -m unittest discover # Assuming tests are discoverable
+        run: export PYTHONPATH=$GITHUB_WORKSPACE && pytest
         working-directory: services/ai
