@@ -1,2 +1,4 @@
 sentry-sdk
 prometheus_client
+celery
+SQLAlchemy

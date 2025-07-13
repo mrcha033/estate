@@ -85,7 +85,7 @@ def generate_weekly_report(self):
         if engine:
             try:
                 with engine.connect() as connection:
-                    result = connection.execute(text("SELECT email FROM "Subscription" WHERE frequency = 'weekly' AND verified = true"))
+                    result = connection.execute(text("SELECT email FROM \"Subscription\" WHERE frequency = 'weekly' AND verified = true"))
                     subscribers = result.fetchall()
                 logging.info(f"Fetched {len(subscribers)} weekly subscribers.")
 
@@ -178,7 +178,7 @@ def generate_monthly_report(self):
         if engine:
             try:
                 with engine.connect() as connection:
-                    result = connection.execute(text("SELECT email FROM "Subscription" WHERE frequency = 'monthly' AND verified = true"))
+                    result = connection.execute(text("SELECT email FROM \"Subscription\" WHERE frequency = 'monthly' AND verified = true"))
                     subscribers = result.fetchall()
                 logging.info(f"Fetched {len(subscribers)} monthly subscribers.")
 
