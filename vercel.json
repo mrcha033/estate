@@ -1,6 +1,13 @@
 {
-  "buildCommand": "cd apps/frontend && npm ci && npm run build",
-  "outputDirectory": "apps/frontend/.next",
-  "framework": "nextjs",
-  "installCommand": "npm install --prefix apps/frontend"
+  "version": 2,
+  "builds": [
+    {
+      "src": "apps/frontend/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/apps/frontend/$1" }
+  ]
 }
