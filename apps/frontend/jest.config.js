@@ -5,7 +5,7 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   transform: {
-    '^.+\.(ts|tsx)$': 'babel-jest',
+    '^.+\.(ts|tsx)$': ['@swc/jest'],
   },
   transformIgnorePatterns: [
     '/node_modules/(?!(@testing-library/react|@testing-library/jest-dom)/)',
