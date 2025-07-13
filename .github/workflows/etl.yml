@@ -29,9 +29,13 @@ jobs:
           python-version: '3.10'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          pip install -r requirements.txt
+          pip install pytest
         working-directory: services/etl
 
       - name: Run tests
-        run: python -m unittest discover # Assuming tests are discoverable
+        run: |
+          export PYTHONPATH=$GITHUB_WORKSPACE
+          python -m pytest test_tasks.py -v
         working-directory: services/etl
