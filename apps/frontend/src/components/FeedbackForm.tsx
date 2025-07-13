@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 interface FeedbackFormProps {
   onSubmit: (data: { name: string; email: string; message: string }) => void;
   onSuccess?: () => void;
-  onError?: (error: any) => void;
+  onError?: (error: unknown) => void;
 }
 
 const FeedbackForm: React.FC<FeedbackFormProps> = ({ onSubmit, onSuccess, onError }) => {

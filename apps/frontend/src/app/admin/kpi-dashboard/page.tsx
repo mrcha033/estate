@@ -38,15 +38,19 @@ export default function KPIDashboardPage() {
         }
         const data: KPIMetrics = await response.json();
         setMetrics(data);
-      } catch (error: any) {
-        setError(error.message);
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          setError(error.message);
+        } else {
+          setError("An unknown error occurred");
+        }
       } finally {
         setLoading(false);
       }
     };
 
     checkUser();
-  }, []);
+  }, [router]);
 
   if (loading) {
     return (

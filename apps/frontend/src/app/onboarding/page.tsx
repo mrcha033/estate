@@ -18,7 +18,7 @@ export default function OnboardingPage() {
           <h3 className="text-xl font-semibold text-gray-800">Getting Started</h3>
           <ol className="list-decimal list-inside space-y-2 text-gray-700">
             <li>
-              If you haven't already, please{' '}
+              If you haven&apos;t already, please{' '}
               <Link href="/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
                 sign up here
               </Link>{' '}

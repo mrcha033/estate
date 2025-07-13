@@ -2,13 +2,20 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabaseClient'; // Assuming you have a Supabase client setup in frontend
 
+interface User {
+  email: string;
+  app_metadata: {
+    user_role?: string;
+  };
+}
+
 export default function AdminPage() {
   const router = useRouter();
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [etlLogs, setEtlLogs] = useState<any[]>([]);
-  const [errorReports, setErrorReports] = useState<any[]>([]);
-  const [dataQualityMetrics, setDataQualityMetrics] = useState<any[]>([]);
+  const [etlLogs, setEtlLogs] = useState<string[]>([]);
+  const [errorReports, setErrorReports] = useState<string[]>([]);
+  const [dataQualityMetrics, setDataQualityMetrics] = useState<string[]>([]);
 
   useEffect(() => {
     async function checkUser() {

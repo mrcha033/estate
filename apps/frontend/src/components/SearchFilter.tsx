@@ -1,7 +1,16 @@
 import React from 'react';
 
+interface SearchFilters {
+  district: string;
+  neighborhood: string;
+  subwayLine: string;
+  yearBuilt: string;
+  minPrice: string;
+  maxPrice: string;
+}
+
 interface SearchFilterProps {
-  onSearch: (filters: any) => void;
+  onSearch: (filters: SearchFilters) => void;
 }
 
 const SearchFilter: React.FC<SearchFilterProps> = ({ onSearch }) => {

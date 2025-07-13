@@ -7,8 +7,17 @@ const LazyLoadedComponent = dynamic(() => import('@/components/LazyLoadedCompone
   ssr: false,
 });
 
+interface SearchFilters {
+  district: string;
+  neighborhood: string;
+  subwayLine: string;
+  yearBuilt: string;
+  minPrice: string;
+  maxPrice: string;
+}
+
 export default function SearchPage() {
-  const handleSearch = (filters: any) => {
+  const handleSearch = (filters: SearchFilters) => {
     console.log('Search filters:', filters);
     const analytics = getAnalytics();
     analytics?.track('Product Search', filters);
