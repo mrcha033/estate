@@ -32,7 +32,7 @@ export async function dataQARoutes (fastify: FastifyInstance) {
 
   // Trigger data reprocessing
   fastify.post('/admin/reprocess-data', async (request, reply) => {
-    log_audit_event(request.user?.id || 'unknown', 'trigger_data_reprocessing', request.body);
+    log_audit_event(request.user?.id || 'unknown', 'trigger_data_reprocessing', request.body as object);
     // Placeholder for triggering data reprocessing
     return { message: 'Data reprocessing triggered.' };
   });

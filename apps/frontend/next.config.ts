@@ -4,6 +4,11 @@ import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  reactStrictMode: true,
+  swcMinify: true,
+  experimental: {
+    // Other experimental features can go here
+  },
 };
 
 const pwaConfig = withPWA({

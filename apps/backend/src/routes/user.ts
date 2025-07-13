@@ -1,11 +1,12 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
+import { FastifyInstance } from 'fastify'
+import { getAnalytics } from '../lib/segment'
+import { Analytics } from '@segment/analytics-node'
 import { supabase } from '../lib/supabase'
+import { prisma } from '../lib/prisma'
 import { generateToken, verifyToken } from '../lib/jwt'
 import redisClient from '../lib/redis'
 import { encrypt, decrypt } from '../lib/encryption'
 import { sendEmail } from '../lib/ses'
-import { prisma } from '../lib/prisma'
-import { getAnalytics } from '../lib/segment'
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -20,6 +21,16 @@ interface User {
 }
 
 const users: User[] = [] // In-memory storage for demonstration
+
+
+
+
+
+    
+
+
+
+// Remove redundant interface - using Analytics properties directly
 
 export async function userRoutes (fastify: FastifyInstance) {
   // User registration
@@ -37,8 +48,9 @@ export async function userRoutes (fastify: FastifyInstance) {
     // Track user signup event
     const analytics = getAnalytics();
     if (data.user) {
-      analytics?.track('User Signed Up', {
+      analytics?.track({
         userId: data.user.id,
+        event: 'User Signed Up'
       });
     }
 
@@ -77,8 +89,9 @@ export async function userRoutes (fastify: FastifyInstance) {
 
     // Track user login event
     const analytics = getAnalytics();
-    analytics?.track('User Logged In', {
+    analytics?.track({
       userId: user.id,
+      event: 'User Logged In'
     });
 
     // Assign a default role, e.g., 'user'
@@ -167,6 +180,7 @@ export async function userRoutes (fastify: FastifyInstance) {
     const user = users.find(u => u.id === id)
     if (!user) {
       reply.code(404).send({ message: 'User not found' })
+      return // Add return here to prevent further execution
     }
     // Decrypt email before returning
     return { user: { ...user, email: decrypt(user.email) } }

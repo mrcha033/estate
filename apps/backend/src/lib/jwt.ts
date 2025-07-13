@@ -1,12 +1,14 @@
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecretjwtkey'; // Use a strong secret in production
+const JWT_SECRET: string = process.env.JWT_SECRET || 'supersecretjwtkey';
 
-export const generateToken = (payload: object, expiresIn: string) => {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn });
+export const generateToken = (payload: string | object | Buffer, expiresIn: string): string => {
+  return jwt.sign(payload, JWT_SECRET, { 
+    expiresIn: expiresIn as string | number 
+  } as jwt.SignOptions);
 };
 
-export const verifyToken = (token: string) => {
+export const verifyToken = (token: string): string | jwt.JwtPayload | null => {
   try {
     return jwt.verify(token, JWT_SECRET);
   } catch (error) {

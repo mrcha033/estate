@@ -1,1 +1,2 @@
 2025-07-13 16:26:47,185 - ERROR - ETL Alert: Connection error in fetch_data_from_api for http://fail.example.com: Simulated API connection error
+2025-07-13 20:42:00,471 - ERROR - ETL Alert: Connection error in fetch_data_from_api for http://fail.example.com: Simulated API connection error

@@ -1,5 +1,5 @@
 import pytest
-from services.etl.tasks import fetch_data_from_api
+from tasks import fetch_data_from_api
 
 def test_fetch_data_from_api_success():
     result = fetch_data_from_api("http://example.com/api/data")

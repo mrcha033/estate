@@ -1,0 +1,111 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.adminRoutes = adminRoutes;
+const prisma_1 = require("../lib/prisma");
+const crypto_1 = require("crypto");
+const ses_1 = require("../lib/ses");
+async function adminRoutes(fastify) {
+    fastify.get('/admin', async (request, reply) => {
+        if (request.user?.role !== 'admin') {
+            return reply.code(403).send({ message: 'Forbidden: Admins only' });
+        }
+        return { message: 'Admin dashboard' };
+    });
+    fastify.post('/admin/beta-invitations/generate', async (request, reply) => {
+        if (request.user?.role !== 'admin') {
+            return reply.code(403).send({ message: 'Forbidden: Admins only' });
+        }
+        const { email } = request.body;
+        if (!email) {
+            return reply.code(400).send({ message: 'Email is required' });
+        }
+        const token = (0, crypto_1.randomBytes)(16).toString('hex'); // Generate a random 32-character hex token
+        try {
+            const betaInvitation = await prisma_1.prisma.betaInvitation.create({
+                data: {
+                    email,
+                    token,
+                },
+            });
+            // Assuming your frontend is at http://localhost:3000 for now
+            const invitationLink = `http://localhost:3000/signup?token=${token}`;
+            const subject = 'Your Beta Invitation to Estate';
+            const body = `
+        <p>Dear Beta User,</p>
+        <p>Welcome to the Estate closed beta program! We're excited to have you on board.</p>
+        <p>To get started, please use the following link to sign up:</p>
+        <p><a href="${invitationLink}">${invitationLink}</a></p>
+        <p>If you have any questions, please don't hesitate to reach out to our support team.</p>
+        <p>Best regards,</p>
+        <p>The Estate Team</p>
+      `;
+            await (0, ses_1.sendEmail)(email, subject, body);
+            return { message: 'Beta invitation generated and email sent', invitationLink, betaInvitation };
+        }
+        catch (error) {
+            if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+                return reply.code(409).send({ message: 'A beta invitation for this email already exists.' });
+            }
+            console.error('Error generating beta invitation or sending email:', error);
+            return reply.code(500).send({ message: 'Failed to generate beta invitation or send email' });
+        }
+    });
+    fastify.get('/admin/beta-invitations/metrics', async (request, reply) => {
+        if (request.user?.role !== 'admin') {
+            return reply.code(403).send({ message: 'Forbidden: Admins only' });
+        }
+        try {
+            const totalInvitations = await prisma_1.prisma.betaInvitation.count();
+            const usedInvitations = await prisma_1.prisma.betaInvitation.count({
+                where: { used: true },
+            });
+            const unusedInvitations = totalInvitations - usedInvitations;
+            return {
+                totalInvitations,
+                usedInvitations,
+                unusedInvitations,
+            };
+        }
+        catch (error) {
+            console.error('Error fetching beta invitation metrics:', error);
+            return reply.code(500).send({ message: 'Failed to fetch beta invitation metrics' });
+        }
+    });
+    fastify.get('/admin/kpi-metrics', async (request, reply) => {
+        if (request.user?.role !== 'admin') {
+            return reply.code(403).send({ message: 'Forbidden: Admins only' });
+        }
+        try {
+            // MAU: For simplicity, let's count users who signed up in the last 30 days
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+            // This assumes `createdAt` is available on the User model, which it is not currently.
+            // For a real implementation, you would need to track user activity (e.g., last login, event timestamps)
+            // or query a dedicated analytics table populated by Segment's warehouse sync.
+            // For now, we'll just return a placeholder for MAU.
+            const mau = 0; // Placeholder
+            // Total Users (from Supabase Auth, not directly from Prisma User model unless synced)
+            // For now, we'll use the count of beta invitations that have been used as a proxy for active users.
+            const totalUsers = await prisma_1.prisma.betaInvitation.count({
+                where: { used: true },
+            });
+            // Report Open Rates: Placeholder, as this would come from Segment data
+            const reportOpenRate = 'N/A';
+            // Session Duration: Placeholder, as this would come from Segment data
+            const avgSessionDuration = 'N/A';
+            // ETL Health Status: Placeholder, as this would come from ETL service monitoring
+            const etlHealthStatus = 'Operational';
+            return {
+                mau,
+                totalUsers,
+                reportOpenRate,
+                avgSessionDuration,
+                etlHealthStatus,
+            };
+        }
+        catch (error) {
+            console.error('Error fetching KPI metrics:', error);
+            return reply.code(500).send({ message: 'Failed to fetch KPI metrics' });
+        }
+    });
+}

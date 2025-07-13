@@ -1,3 +1,5 @@
+'use client';
+
 import SimpleLineChart from '@/components/SimpleLineChart';
 import SimpleBarChart from '@/components/SimpleBarChart';
 import { useEffect, useState } from 'react';
