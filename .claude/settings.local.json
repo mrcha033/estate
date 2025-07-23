@@ -16,7 +16,10 @@
       "Bash(python:*)",
       "Bash(npm install:*)",
       "Bash(docker push:*)",
-      "Bash(docker tag:*)"
+      "Bash(docker tag:*)",
+      "Bash(eksctl create cluster:*)",
+      "Bash(npm install:*)",
+      "Bash(npm test)"
     ],
     "deny": []
   }
