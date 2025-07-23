@@ -32,7 +32,6 @@ export default function SubscribePage() {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     const analytics = getAnalytics();

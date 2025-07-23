@@ -31,10 +31,15 @@ interface District {
   transaction_count: number;
 }
 
+interface Neighborhood {
+  dong_name: string;
+  transaction_count: number;
+}
+
 export default function EnhancedSearchFilter({ onSearch, initialFilters, loading }: EnhancedSearchFilterProps) {
   const [filters, setFilters] = useState<SearchFilters>(initialFilters);
   const [districts, setDistricts] = useState<District[]>([]);
-  const [neighborhoods, setNeighborhoods] = useState<any[]>([]);
+  const [neighborhoods, setNeighborhoods] = useState<Neighborhood[]>([]);
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Fetch districts on component mount
@@ -75,7 +80,7 @@ export default function EnhancedSearchFilter({ onSearch, initialFilters, loading
     }
   };
 
-  const updateFilter = (key: keyof SearchFilters, value: any) => {
+  const updateFilter = (key: keyof SearchFilters, value: string | number | undefined) => {
     setFilters(prev => ({
       ...prev,
       [key]: value || undefined
@@ -147,7 +152,7 @@ export default function EnhancedSearchFilter({ onSearch, initialFilters, loading
                 onChange={(e) => updateFilter('dong_name', e.target.value)}
               >
                 <option value="">전체 동</option>
-                {neighborhoods.map((neighborhood: any) => (
+                {neighborhoods.map((neighborhood) => (
                   <option key={neighborhood.dong_name} value={neighborhood.dong_name}>
                     {neighborhood.dong_name} ({neighborhood.transaction_count.toLocaleString()}건)
                   </option>

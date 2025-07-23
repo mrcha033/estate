@@ -18,7 +18,7 @@ interface SearchStatsProps {
     hasNextPage: boolean;
     hasPrevPage: boolean;
   };
-  filters: any;
+  filters: Record<string, string | number | undefined>;
 }
 
 export default function SearchStats({ statistics, pagination, filters }: SearchStatsProps) {

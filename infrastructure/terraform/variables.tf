@@ -27,3 +27,15 @@ variable "segment_write_key" {
   type        = string
   sensitive   = true
 }
+
+variable "openai_api_key" {
+  description = "OpenAI API Key for AI services"
+  type        = string
+  sensitive   = true
+}
+
+variable "kreb_api_key" {
+  description = "KREB API Key for real estate data"
+  type        = string
+  sensitive   = true
+}

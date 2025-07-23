@@ -40,23 +40,15 @@ spec:
             env:
             - name: CELERY_BROKER
               value: "redis://redis-service:6379/0"
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: estate-secrets
-                  key: database-url
-            - name: KREB_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: estate-secrets
-                  key: kreb-api-key
+            - name: NODE_ENV
+              value: "production"
+            - name: AWS_REGION
+              value: "ap-northeast-2"
             - name: SENTRY_DSN
               valueFrom:
                 secretKeyRef:
                   name: estate-secrets
                   key: sentry-dsn
-            - name: AWS_REGION
-              value: "ap-northeast-2"
             resources:
               requests:
                 memory: "512Mi"
@@ -106,16 +98,10 @@ spec:
             env:
             - name: CELERY_BROKER
               value: "redis://redis-service:6379/0"
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: estate-secrets
-                  key: database-url
-            - name: OPENAI_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: estate-secrets
-                  key: openai-api-key
+            - name: NODE_ENV
+              value: "production"
+            - name: AWS_REGION
+              value: "ap-northeast-2"
             - name: SENTRY_DSN
               valueFrom:
                 secretKeyRef:
@@ -123,8 +109,6 @@ spec:
                   key: sentry-dsn
             - name: S3_BUCKET_NAME
               value: "estate-app-bucket"
-            - name: AWS_REGION
-              value: "ap-northeast-2"
             resources:
               requests:
                 memory: "256Mi"
@@ -174,16 +158,10 @@ spec:
             env:
             - name: CELERY_BROKER
               value: "redis://redis-service:6379/0"
-            - name: DATABASE_URL
-              valueFrom:
-                secretKeyRef:
-                  name: estate-secrets
-                  key: database-url
-            - name: OPENAI_API_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: estate-secrets
-                  key: openai-api-key
+            - name: NODE_ENV
+              value: "production"
+            - name: AWS_REGION
+              value: "ap-northeast-2"
             - name: SENTRY_DSN
               valueFrom:
                 secretKeyRef:
@@ -191,8 +169,6 @@ spec:
                   key: sentry-dsn
             - name: S3_BUCKET_NAME
               value: "estate-app-bucket"
-            - name: AWS_REGION
-              value: "ap-northeast-2"
             resources:
               requests:
                 memory: "256Mi"

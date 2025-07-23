@@ -25,8 +25,24 @@ interface SearchFilters {
   limit?: number;
 }
 
+interface ApartmentTransaction {
+  unique_key: string;
+  district_name: string;
+  dong_name: string;
+  apartment_name: string;
+  transaction_amount_won: number;
+  transaction_amount_display: string;
+  area_sqm: number;
+  area_pyeong: number;
+  construction_year: number;
+  floor: number;
+  transaction_date: string;
+  price_per_sqm: number;
+  data_quality_score: number;
+}
+
 interface SearchResponse {
-  results: any[];
+  results: ApartmentTransaction[];
   pagination: {
     page: number;
     limit: number;
@@ -58,15 +74,6 @@ export default function SearchPage() {
     limit: 20
   });
 
-  const searchParamsString = useMemo(() => {
-    const params = new URLSearchParams();
-    Object.entries(currentFilters).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        params.append(key, value.toString());
-      }
-    });
-    return params.toString();
-  }, [currentFilters]);
 
   const performSearch = async (filters: SearchFilters, resetPage: boolean = true) => {
     try {
@@ -114,6 +121,7 @@ export default function SearchPage() {
   // Initial search on page load
   useEffect(() => {
     performSearch(currentFilters, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSearch = (filters: SearchFilters) => {
@@ -128,7 +136,7 @@ export default function SearchPage() {
   const handleSortChange = (sortBy: string, sortOrder: 'asc' | 'desc') => {
     const newFilters = { 
       ...currentFilters, 
-      sort_by: sortBy as any, 
+      sort_by: sortBy as 'price' | 'date' | 'area' | 'price_per_sqm', 
       sort_order: sortOrder,
       page: 1 
     };

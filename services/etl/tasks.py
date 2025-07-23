@@ -7,20 +7,7 @@ import sentry_sdk
 import os
 from prometheus_client import Counter
 import boto3
-
-# Initialize Secrets Manager client
-secrets_client = boto3.client('secretsmanager', region_name=os.environ.get("AWS_REGION"))
-
-def get_secret(secret_name):
-    try:
-        response = secrets_client.get_secret_value(SecretId=secret_name)
-        if 'SecretString' in response:
-            return response['SecretString']
-        else:
-            return json.loads(response['SecretBinary'].decode('utf-8'))
-    except Exception as e:
-        print(f"Error retrieving secret {secret_name}: {e}")
-        raise
+from services.etl.secrets_manager import secrets_manager
 
 # Prometheus Metrics
 etl_tasks_processed = Counter('etl_tasks_processed_total', 'Total number of ETL tasks processed', ['task_name', 'status'])
@@ -45,9 +32,7 @@ def fetch_seoul_apartment_data(self):
         logging.info("Fetching Seoul apartment transaction data from government API")
         
         # Korean Real Estate Board (R-ONE) API endpoint
-        api_key = os.environ.get("KREB_API_KEY")
-        if not api_key:
-            api_key = get_secret("kreb-api-key")
+        api_key = secrets_manager.get_kreb_api_key()
         
         base_url = "http://apis.data.go.kr/1613000/RTMSDataSvcAptTradeDev/getRTMSDataSvcAptTradeDev"
         
@@ -275,9 +260,7 @@ def store_seoul_apartment_data_in_postgresql(deduplicated_data):
         logging.info(f"Storing {len(transactions)} Seoul apartment records in PostgreSQL")
         
         # Get database connection
-        database_url = os.environ.get("DATABASE_URL")
-        if not database_url:
-            database_url = get_secret("database-url")
+        database_url = secrets_manager.get_database_url()
         
         engine = create_engine(database_url)
         

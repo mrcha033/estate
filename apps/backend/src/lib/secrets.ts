@@ -36,11 +36,11 @@ export async function loadSecrets(): Promise<void> {
 
   if (process.env.NODE_ENV === 'production') {
     try {
-      appSecrets.DATABASE_URL = await getSecret('DATABASE_URL'); // Replace with your actual secret name
-      appSecrets.JWT_SECRET = await getSecret('JWT_SECRET'); // Replace with your actual secret name
-      appSecrets.AWS_SES_ACCESS_KEY_ID = await getSecret('AWS_SES_ACCESS_KEY_ID'); // Replace with your actual secret name
-      appSecrets.AWS_SES_SECRET_ACCESS_KEY = await getSecret('AWS_SES_SECRET_ACCESS_KEY'); // Replace with your actual secret name
-      appSecrets.SEGMENT_WRITE_KEY = await getSecret('SEGMENT_WRITE_KEY'); // Replace with your actual secret name
+      appSecrets.DATABASE_URL = await getSecret('estate/database/url');
+      appSecrets.JWT_SECRET = await getSecret('estate/jwt/secret');
+      appSecrets.AWS_SES_ACCESS_KEY_ID = await getSecret('estate/ses/access_key_id');
+      appSecrets.AWS_SES_SECRET_ACCESS_KEY = await getSecret('estate/ses/secret_access_key');
+      appSecrets.SEGMENT_WRITE_KEY = await getSecret('estate/segment/write_key');
       secretsLoaded = true;
       console.log('Secrets loaded successfully from AWS Secrets Manager.');
     } catch (error) {

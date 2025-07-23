@@ -7,6 +7,7 @@ import boto3
 from sqlalchemy import create_engine, text
 import logging
 from services.ai.lib.email_logger import log_email_delivery_status, log_bounce_or_unsubscribe
+from services.ai.secrets_manager import secrets_manager
 from prometheus_client import Counter
 
 # Prometheus Metrics
@@ -15,8 +16,8 @@ ai_tasks_processed = Counter('ai_tasks_processed_total', 'Total number of AI tas
 # Configure logging for the AI service
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Configure OpenAI API key
-openai.api_key = os.environ.get("OPENAI_API_KEY")
+# Configure OpenAI API key using secrets manager
+openai.api_key = secrets_manager.get_openai_api_key()
 openai.api_base = os.environ.get("OPENAI_API_BASE") # For Azure OpenAI
 openai.api_type = os.environ.get("OPENAI_API_TYPE") # For Azure OpenAI
 openai.api_version = os.environ.get("OPENAI_API_VERSION") # For Azure OpenAI
@@ -29,8 +30,8 @@ s3_client = boto3.client(
     region_name=os.environ.get("AWS_REGION"),
 )
 
-# Configure PostgreSQL engine
-DATABASE_URL = os.environ.get("DATABASE_URL")
+# Configure PostgreSQL engine using secrets manager
+DATABASE_URL = secrets_manager.get_database_url()
 engine = create_engine(DATABASE_URL) if DATABASE_URL else None
 
 @shared_task(bind=True, max_retries=3, default_retry_delay=300)

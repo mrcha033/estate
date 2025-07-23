@@ -31,7 +31,12 @@
       "Bash(kubectl port-forward:*)",
       "Bash(taskkill:*)",
       "Bash(Stop-Process -Id 12412 -Force)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(npm run lint)",
+      "Bash(find:*)",
+      "Bash(npx tsc:*)",
+      "mcp__vooster-ai__get_next_task",
+      "Bash(terraform:*)"
     ],
     "deny": []
   }
