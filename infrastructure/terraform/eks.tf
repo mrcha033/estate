@@ -5,8 +5,9 @@ resource "aws_eks_cluster" "main" {
 
   vpc_config {
     subnet_ids = [
-      "subnet-xxxxxxxxxxxxxxxxx", # Replace with actual subnet IDs
-      "subnet-yyyyyyyyyyyyyyyyy"
+      "subnet-0f650ce1d67e32eb3"
+      "subnet-0be07a7fe9a774a89"
+      "subnet-0a756f2a76bd8bbf0"
     ]
   }
 }
