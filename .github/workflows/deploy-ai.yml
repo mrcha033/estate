@@ -38,10 +38,14 @@ jobs:
 
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig --name estate-eks-cluster --region us-east-1 # Replace with your cluster name and region
+          aws eks update-kubeconfig --name estate-eks-cluster --region ap-northeast-2
 
       - name: Deploy to EKS
         run: |
-          # Replace with your kubectl commands to deploy to EKS
-          # Example: kubectl apply -f k8s/ai-deployment.yaml
-          echo "Deploying AI service to EKS..."
+          kubectl apply -f k8s/ai-configmap.yaml
+          kubectl apply -f k8s/ai-deployment.yaml
+          kubectl apply -f k8s/ai-worker-deployment.yaml
+          kubectl set image deployment/estate-ai estate-ai=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          kubectl set image deployment/estate-ai-worker estate-ai-worker=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          kubectl rollout status deployment/estate-ai
+          kubectl rollout status deployment/estate-ai-worker

@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:nextjs.org)",
+      "Bash(npm run build:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(npm run build:*)",
+      "Bash(aws ecr create-repository:*)",
+      "Bash(npm install)",
+      "Bash(aws:*)",
+      "Bash(docker build:*)",
+      "Bash(docker push:*)",
+      "WebFetch(domain:docs.sentry.io)",
+      "Bash(npx next:*)",
+      "Bash(docker tag:*)",
+      "Bash(python:*)"
+    ],
+    "deny": []
+  }
+}

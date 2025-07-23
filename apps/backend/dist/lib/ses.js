@@ -2,11 +2,13 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendEmail = sendEmail;
 const client_ses_1 = require("@aws-sdk/client-ses");
+const secrets_1 = require("./secrets");
+const secrets = (0, secrets_1.getSecrets)();
 const sesClient = new client_ses_1.SESClient({
     region: process.env.AWS_REGION || 'us-east-1',
     credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID || '',
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || '',
+        accessKeyId: secrets.AWS_SES_ACCESS_KEY_ID || '',
+        secretAccessKey: secrets.AWS_SES_SECRET_ACCESS_KEY || '',
     },
 });
 async function sendEmail(toAddress, subject, body) {

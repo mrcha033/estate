@@ -3,3 +3,4 @@ sentry-sdk
 prometheus_client
 SQLAlchemy==2.0.30
 python-dotenv
+boto3

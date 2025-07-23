@@ -15,6 +15,7 @@ const subscriptions_1 = require("./routes/subscriptions");
 const data_qa_1 = require("./routes/data_qa");
 const auth_1 = require("./plugins/auth");
 const metrics_1 = require("./plugins/metrics");
+const secrets_1 = require("./lib/secrets");
 const fastify = (0, fastify_1.default)({
     logger: true
 });
@@ -33,6 +34,7 @@ fastify.get('/', async (request, reply) => {
     return { hello: 'world' };
 });
 const start = async () => {
+    await (0, secrets_1.loadSecrets)();
     try {
         await fastify.listen({ port: 3000 });
     }

@@ -20,7 +20,7 @@ async function getSecret(secretName: string): Promise<string> {
     if ('SecretString' in data && data.SecretString) {
       return data.SecretString;
     } else if (data.SecretBinary) {
-      return Buffer.from(data.SecretBinary as string, 'base64').toString('ascii');
+      return Buffer.from(data.SecretBinary as Uint8Array).toString('ascii');
     }
     throw new Error('Secret not found or empty');
   } catch (error) {
