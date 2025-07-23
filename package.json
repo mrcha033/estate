@@ -1,5 +1,9 @@
 {
   "dependencies": {
-    "@composio/mcp": "^1.0.7"
+    "@composio/mcp": "^1.0.7",
+    "@sentry/nextjs": "^9.40.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.1.0"
   }
 }

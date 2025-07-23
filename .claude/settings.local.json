@@ -13,7 +13,10 @@
       "WebFetch(domain:docs.sentry.io)",
       "Bash(npx next:*)",
       "Bash(docker tag:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(npm install:*)",
+      "Bash(docker push:*)",
+      "Bash(docker tag:*)"
     ],
     "deny": []
   }
