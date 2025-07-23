@@ -18,7 +18,6 @@ spec:
       containers:
       - name: estate-ai
         image: 869935091548.dkr.ecr.ap-northeast-2.amazonaws.com/estate-ai:latest
-        command: ["python", "main.py", "web"]
         ports:
         - containerPort: 8000
         env:

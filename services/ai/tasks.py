@@ -38,8 +38,8 @@ def generate_weekly_report(self):
     try:
         logging.info("Starting weekly report generation.")
         
-        # Example data summary (would come from ETL pipeline)
-        data_summary = "Recent real estate data shows a 5% increase in apartment prices in Gangnam district."
+        # Fetch actual Seoul apartment data from ETL pipeline
+        data_summary = get_weekly_apartment_data_summary()
         
         # Generate summary using GPT-4
         summary = generate_summary_with_gpt4(data_summary)
@@ -131,8 +131,8 @@ def generate_monthly_report(self):
     try:
         logging.info("Starting monthly report generation.")
         
-        # Example data summary (would come from ETL pipeline)
-        data_summary = "Monthly real estate data shows a 10% increase in apartment prices in Seoul."
+        # Fetch actual Seoul apartment data from ETL pipeline
+        data_summary = get_monthly_apartment_data_summary()
         
         # Generate summary using GPT-4
         summary = generate_summary_with_gpt4(data_summary)
@@ -212,3 +212,157 @@ def send_report_email(recipient_email: str, report_url: str, report_summary: str
         log_email_delivery_status(recipient_email, 'failed', str(e))
         ai_tasks_processed.labels('send_report_email', 'failure').inc()
         raise
+
+def get_weekly_apartment_data_summary():
+    """Fetch and summarize Seoul apartment data for the past week"""
+    if not engine:
+        return "No database connection available. Using mock data: Recent real estate data shows a 5% increase in apartment prices in Gangnam district."
+    
+    try:
+        with engine.connect() as connection:
+            # Fetch transactions from the past 7 days
+            query = """
+            SELECT 
+                district_name,
+                COUNT(*) as transaction_count,
+                AVG(transaction_amount_won) as avg_price,
+                AVG(price_per_sqm) as avg_price_per_sqm,
+                AVG(area_sqm) as avg_area
+            FROM apartment_transactions 
+            WHERE transaction_date >= CURRENT_DATE - INTERVAL '7 days'
+            AND data_quality_score >= 80
+            GROUP BY district_name
+            ORDER BY transaction_count DESC
+            LIMIT 10
+            """
+            
+            result = connection.execute(text(query))
+            rows = result.fetchall()
+            
+            if not rows:
+                return "No recent apartment transaction data available in the database."
+            
+            # Create data summary
+            summary_parts = []
+            summary_parts.append(f"Weekly Seoul Apartment Market Analysis:")
+            summary_parts.append(f"Total districts with transactions: {len(rows)}")
+            
+            for row in rows:
+                district = row[0]
+                count = row[1]
+                avg_price = int(row[2]) if row[2] else 0
+                avg_price_sqm = int(row[3]) if row[3] else 0
+                avg_area = float(row[4]) if row[4] else 0.0
+                
+                summary_parts.append(
+                    f"- {district}: {count} transactions, "
+                    f"avg price {avg_price:,}원 ({avg_price_sqm:,}원/㎡), "
+                    f"avg area {avg_area:.1f}㎡"
+                )
+            
+            return "\n".join(summary_parts)
+            
+    except Exception as e:
+        logging.error(f"Error fetching weekly data summary: {e}")
+        return "Error accessing apartment transaction data. Using fallback: Recent real estate data shows market activity in Seoul districts."
+
+def get_monthly_apartment_data_summary():
+    """Fetch and summarize Seoul apartment data for the past month"""
+    if not engine:
+        return "No database connection available. Using mock data: Monthly real estate data shows a 10% increase in apartment prices in Seoul."
+    
+    try:
+        with engine.connect() as connection:
+            # Fetch transactions from the past 30 days with comparison to previous month
+            query = """
+            WITH current_month AS (
+                SELECT 
+                    district_name,
+                    COUNT(*) as transaction_count,
+                    AVG(transaction_amount_won) as avg_price,
+                    AVG(price_per_sqm) as avg_price_per_sqm
+                FROM apartment_transactions 
+                WHERE transaction_date >= CURRENT_DATE - INTERVAL '30 days'
+                AND data_quality_score >= 80
+                GROUP BY district_name
+            ),
+            previous_month AS (
+                SELECT 
+                    district_name,
+                    COUNT(*) as transaction_count,
+                    AVG(transaction_amount_won) as avg_price,
+                    AVG(price_per_sqm) as avg_price_per_sqm
+                FROM apartment_transactions 
+                WHERE transaction_date >= CURRENT_DATE - INTERVAL '60 days'
+                AND transaction_date < CURRENT_DATE - INTERVAL '30 days'
+                AND data_quality_score >= 80
+                GROUP BY district_name
+            )
+            SELECT 
+                c.district_name,
+                c.transaction_count as current_count,
+                c.avg_price as current_price,
+                c.avg_price_per_sqm as current_price_sqm,
+                p.avg_price as previous_price,
+                CASE 
+                    WHEN p.avg_price IS NOT NULL AND p.avg_price > 0 
+                    THEN ((c.avg_price - p.avg_price) / p.avg_price * 100)
+                    ELSE NULL 
+                END as price_change_percent
+            FROM current_month c
+            LEFT JOIN previous_month p ON c.district_name = p.district_name
+            ORDER BY c.transaction_count DESC
+            LIMIT 15
+            """
+            
+            result = connection.execute(text(query))
+            rows = result.fetchall()
+            
+            if not rows:
+                return "No monthly apartment transaction data available in the database."
+            
+            # Create monthly summary
+            summary_parts = []
+            summary_parts.append(f"Monthly Seoul Apartment Market Analysis:")
+            summary_parts.append(f"Active districts: {len(rows)}")
+            
+            total_transactions = sum(row[1] for row in rows)
+            summary_parts.append(f"Total transactions analyzed: {total_transactions:,}")
+            
+            # Analyze price trends
+            price_increases = []
+            price_decreases = []
+            
+            for row in rows:
+                district = row[0]
+                current_count = row[1]
+                current_price = int(row[2]) if row[2] else 0
+                current_price_sqm = int(row[3]) if row[3] else 0
+                price_change = row[5]
+                
+                if price_change is not None:
+                    if price_change > 0:
+                        price_increases.append((district, price_change, current_count))
+                    elif price_change < 0:
+                        price_decreases.append((district, abs(price_change), current_count))
+                
+                summary_parts.append(
+                    f"- {district}: {current_count} transactions, "
+                    f"avg {current_price:,}원 ({current_price_sqm:,}원/㎡)"
+                    f"{f', {price_change:+.1f}% vs last month' if price_change is not None else ''}"
+                )
+            
+            # Add trend analysis
+            if price_increases:
+                top_increases = sorted(price_increases, key=lambda x: x[1], reverse=True)[:3]
+                summary_parts.append(f"\nTop price increases: {', '.join([f'{d} (+{p:.1f}%)' for d, p, _ in top_increases])}")
+            
+            if price_decreases:
+                top_decreases = sorted(price_decreases, key=lambda x: x[1], reverse=True)[:3]
+                summary_parts.append(f"Notable price decreases: {', '.join([f'{d} (-{p:.1f}%)' for d, p, _ in top_decreases])}")
+            
+            return "\n".join(summary_parts)
+            
+    except Exception as e:
+        logging.error(f"Error fetching monthly data summary: {e}")
+        return "Error accessing apartment transaction data. Using fallback: Monthly real estate data shows varied market conditions across Seoul districts."

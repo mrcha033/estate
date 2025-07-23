@@ -38,14 +38,13 @@ app = Celery('etl_service', broker='redis://localhost:6379/0', backend='redis://
 
 # Configure Celery Beat for periodic tasks
 app.conf.beat_schedule = {
-    'run-daily-etl': {
-        'task': 'services.etl.tasks.fetch_data_from_api',
-        'schedule': crontab(hour=0, minute=0), # Run daily at midnight
-        'args': ('http://example.com/api/data',)
+    'run-seoul-apartment-etl': {
+        'task': 'services.etl.tasks.run_seoul_apartment_etl_pipeline',
+        'schedule': crontab(hour=2, minute=0), # Run daily at 2 AM
     },
     'send-daily-etl-summary': {
         'task': 'services.etl.tasks.send_daily_etl_summary_email',
-        'schedule': crontab(hour=1, minute=0), # Run daily at 1 AM, after ETL
+        'schedule': crontab(hour=3, minute=0), # Run daily at 3 AM, after ETL
     },
 }
 app.conf.timezone = 'UTC'

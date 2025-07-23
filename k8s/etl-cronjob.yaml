@@ -1,0 +1,202 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: estate-etl-daily
+  namespace: default
+spec:
+  schedule: "0 2 * * *"  # Daily at 2 AM UTC
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: estate-etl-cronjob
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: estate-etl-runner
+            image: 869935091548.dkr.ecr.ap-northeast-2.amazonaws.com/estate-etl:latest
+            command: 
+            - python
+            - -c
+            - |
+              from services.etl.tasks import run_seoul_apartment_etl_pipeline
+              import os
+              import logging
+              
+              logging.basicConfig(level=logging.INFO)
+              print("Starting scheduled ETL pipeline...")
+              
+              try:
+                  result = run_seoul_apartment_etl_pipeline()
+                  print(f"ETL pipeline completed successfully: {result}")
+                  exit(0)
+              except Exception as e:
+                  print(f"ETL pipeline failed: {e}")
+                  exit(1)
+            env:
+            - name: CELERY_BROKER
+              value: "redis://redis-service:6379/0"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: estate-secrets
+                  key: database-url
+            - name: KREB_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: estate-secrets
+                  key: kreb-api-key
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: estate-secrets
+                  key: sentry-dsn
+            - name: AWS_REGION
+              value: "ap-northeast-2"
+            resources:
+              requests:
+                memory: "512Mi"
+                cpu: "500m"
+              limits:
+                memory: "1Gi"
+                cpu: "1000m"
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: estate-ai-weekly-report
+  namespace: default
+spec:
+  schedule: "0 4 * * 1"  # Weekly on Monday at 4 AM UTC
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: estate-ai-cronjob
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: estate-ai-weekly
+            image: 869935091548.dkr.ecr.ap-northeast-2.amazonaws.com/estate-ai:latest
+            command: 
+            - python
+            - -c
+            - |
+              from services.ai.tasks import generate_weekly_report
+              import logging
+              
+              logging.basicConfig(level=logging.INFO)
+              print("Starting weekly report generation...")
+              
+              try:
+                  result = generate_weekly_report()
+                  print(f"Weekly report generated successfully: {result}")
+                  exit(0)
+              except Exception as e:
+                  print(f"Weekly report generation failed: {e}")
+                  exit(1)
+            env:
+            - name: CELERY_BROKER
+              value: "redis://redis-service:6379/0"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: estate-secrets
+                  key: database-url
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: estate-secrets
+                  key: openai-api-key
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: estate-secrets
+                  key: sentry-dsn
+            - name: S3_BUCKET_NAME
+              value: "estate-app-bucket"
+            - name: AWS_REGION
+              value: "ap-northeast-2"
+            resources:
+              requests:
+                memory: "256Mi"
+                cpu: "250m"
+              limits:
+                memory: "512Mi"
+                cpu: "500m"
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: estate-ai-monthly-report
+  namespace: default
+spec:
+  schedule: "0 5 1 * *"  # Monthly on 1st day at 5 AM UTC
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 2
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            app: estate-ai-cronjob
+        spec:
+          restartPolicy: OnFailure
+          containers:
+          - name: estate-ai-monthly
+            image: 869935091548.dkr.ecr.ap-northeast-2.amazonaws.com/estate-ai:latest
+            command: 
+            - python
+            - -c
+            - |
+              from services.ai.tasks import generate_monthly_report
+              import logging
+              
+              logging.basicConfig(level=logging.INFO)
+              print("Starting monthly report generation...")
+              
+              try:
+                  result = generate_monthly_report()
+                  print(f"Monthly report generated successfully: {result}")
+                  exit(0)
+              except Exception as e:
+                  print(f"Monthly report generation failed: {e}")
+                  exit(1)
+            env:
+            - name: CELERY_BROKER
+              value: "redis://redis-service:6379/0"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: estate-secrets
+                  key: database-url
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: estate-secrets
+                  key: openai-api-key
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: estate-secrets
+                  key: sentry-dsn
+            - name: S3_BUCKET_NAME
+              value: "estate-app-bucket"
+            - name: AWS_REGION
+              value: "ap-northeast-2"
+            resources:
+              requests:
+                memory: "256Mi"
+                cpu: "250m"
+              limits:
+                memory: "512Mi"
+                cpu: "500m"

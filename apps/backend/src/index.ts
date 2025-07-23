@@ -3,6 +3,7 @@ import { userRoutes } from './routes/user'
 import { insightsRoutes } from './routes/insights'
 import { searchRoutes } from './routes/search'
 import reportsRoutes from './routes/reports'
+import apartmentDataRoutes from './routes/apartment-data'
 import { alertsRoutes } from './routes/alerts'
 import { adminRoutes } from './routes/admin'
 import { preferencesRoutes } from './routes/preferences'
@@ -21,6 +22,7 @@ fastify.register(userRoutes)
 fastify.register(insightsRoutes)
 fastify.register(searchRoutes)
 fastify.register(reportsRoutes)
+fastify.register(apartmentDataRoutes)
 fastify.register(alertsRoutes)
 fastify.register(adminRoutes)
 fastify.register(preferencesRoutes)

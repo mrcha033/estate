@@ -30,7 +30,8 @@
       "Bash(pkill:*)",
       "Bash(kubectl port-forward:*)",
       "Bash(taskkill:*)",
-      "Bash(Stop-Process -Id 12412 -Force)"
+      "Bash(Stop-Process -Id 12412 -Force)",
+      "Bash(chmod:*)"
     ],
     "deny": []
   }

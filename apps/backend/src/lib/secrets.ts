@@ -11,7 +11,7 @@ interface AppSecrets {
 let appSecrets: AppSecrets = {};
 let secretsLoaded = false;
 
-const secretsManagerClient = new SecretsManagerClient({ region: process.env.AWS_REGION });
+const secretsManagerClient = new SecretsManagerClient({ region: process.env.AWS_REGION || 'ap-northeast-2' });
 
 async function getSecret(secretName: string): Promise<string> {
   try {
