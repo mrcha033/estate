@@ -1,5 +1,5 @@
 import type { NextConfig } from "next";
-import withPWA from "next-pwa";
+const withPWA = require("next-pwa");
 import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
@@ -25,8 +25,6 @@ const sentryConfig = withSentryConfig(
     // Upload a larger set of source maps for prettier stack traces (increases build time)
     widenClientFileUpload: true,
 
-    // Transpiles SDK to be compatible with IE11 (increases bundle size)
-    transpileClientSDK: true,
 
     // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
     tunnelRoute: "/monitoring-tunnel",
@@ -53,7 +51,8 @@ silent: !process.env.CI,
 
 // Disable source map uploads if SENTRY_AUTH_TOKEN is not available
 authToken: process.env.SENTRY_AUTH_TOKEN,
-dryRun: !process.env.SENTRY_AUTH_TOKEN,
+disableServerWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
+disableClientWebpackPlugin: !process.env.SENTRY_AUTH_TOKEN,
 
 // For all available options, see:
 // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/

@@ -485,3 +485,22 @@ def send_daily_etl_summary_email():
     logging.info(summary)
     etl_tasks_processed.labels('send_daily_etl_summary_email', 'success').inc()
     return {"message": "ETL summary email sent", "summary": summary}
+
+def fetch_data_from_api(api_url):
+    """
+    Generic API data fetching function for testing purposes
+    """
+    try:
+        logging.info(f"Fetching data from API: {api_url}")
+        
+        if "fail.example.com" in api_url:
+            raise Exception("Simulated API connection error")
+        
+        return {
+            "message": f"Data fetched from {api_url}",
+            "data": []
+        }
+        
+    except Exception as e:
+        logging.error(f"Error fetching data from API {api_url}: {e}")
+        raise
