@@ -25,6 +25,7 @@
     "@eslint/eslintrc": "^3",
     "@swc/core": "^1.12.11",
     "@swc/jest": "^0.2.39",
+    "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/react": "^16.0.0",
     "@types/jest": "^29.5.12",

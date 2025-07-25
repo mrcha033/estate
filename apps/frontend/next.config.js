@@ -1,8 +1,7 @@
-import type { NextConfig } from "next";
-import withPWA from "next-pwa";
-import { withSentryConfig } from "@sentry/nextjs";
+const withPWA = require("next-pwa");
+const { withSentryConfig } = require("@sentry/nextjs");
 
-const nextConfig: NextConfig = {
+const nextConfig = {
   /* config options here */
   reactStrictMode: true,
   experimental: {
@@ -15,9 +14,9 @@ const pwaConfig = withPWA({
   register: true,
   skipWaiting: true,
   disable: process.env.NODE_ENV === "development",
-})(nextConfig as any);
+})(nextConfig);
 
-export default withSentryConfig(
+module.exports = withSentryConfig(
   pwaConfig,
   {
     // For all available options, see:  https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
