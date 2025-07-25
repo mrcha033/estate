@@ -38,7 +38,7 @@ jobs:
 
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig --name estate-eks-cluster --region us-east-1 # Replace with your cluster name and region
+          aws eks update-kubeconfig --name estate-eks-cluster --region ap-northeast-2 # Replace with your cluster name and region
 
       - name: Deploy to EKS
         run: |
