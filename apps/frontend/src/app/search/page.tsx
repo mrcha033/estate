@@ -1,13 +1,13 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { getAnalytics } from '../../lib/segment';
 import EnhancedSearchFilter from '@/components/EnhancedSearchFilter';
 import SearchResults from '@/components/SearchResults';
 import SearchStats from '@/components/SearchStats';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
-interface SearchFilters {
+interface SearchFilters extends Record<string, string | number | undefined> {
   district?: string;
   dong_name?: string;
   apartment_name?: string;

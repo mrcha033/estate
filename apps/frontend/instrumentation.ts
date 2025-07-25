@@ -21,5 +21,5 @@ export const onRequestError = async (
   }
 ) => {
   const { captureRequestError } = await import('@sentry/nextjs');
-  captureRequestError(error, request, context);
+  captureRequestError(error, request, { ...context, routeType: context.routePath.startsWith('/api/') ? 'api' : 'page' });
 };

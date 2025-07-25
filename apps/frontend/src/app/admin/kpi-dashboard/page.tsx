@@ -12,6 +12,9 @@ interface KPIMetrics {
   reportOpenRate: string;
   avgSessionDuration: string;
   etlHealthStatus: string;
+  mauTrendData: { name: string; value: number }[];
+  reportOpenRateTrendData: { name: string; value: number }[];
+  sessionDurationTrendData: { name: string; value: number }[];
 }
 
 export default function KPIDashboardPage() {
