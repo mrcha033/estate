@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "@composio/mcp": "^1.0.7",
-    "@sentry/nextjs": "^9.40.0"
+    "@sentry/nextjs": "^9.40.0",
+    "@tailwindcss/postcss": "^4.1.11"
   },
   "devDependencies": {
     "@types/node": "^24.1.0"
