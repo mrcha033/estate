@@ -49,11 +49,11 @@ export async function loadSecrets(): Promise<void> {
     }
   } else {
     // For development, load from .env or use hardcoded defaults
-    appSecrets.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://user:password@localhost:5432/mydb';
-    appSecrets.JWT_SECRET = process.env.JWT_SECRET || 'supersecretjwtkey';
-    appSecrets.AWS_SES_ACCESS_KEY_ID = process.env.AWS_SES_ACCESS_KEY_ID || 'mock_ses_access_key';
-    appSecrets.AWS_SES_SECRET_ACCESS_KEY = process.env.AWS_SES_SECRET_ACCESS_KEY || 'mock_ses_secret_key';
-    appSecrets.SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY || 'mock_segment_write_key';
+    appSecrets.DATABASE_URL = process.env.DATABASE_URL;
+    appSecrets.JWT_SECRET = process.env.JWT_SECRET;
+    appSecrets.AWS_SES_ACCESS_KEY_ID = process.env.AWS_SES_ACCESS_KEY_ID;
+    appSecrets.AWS_SES_SECRET_ACCESS_KEY = process.env.AWS_SES_SECRET_ACCESS_KEY;
+    appSecrets.SEGMENT_WRITE_KEY = process.env.SEGMENT_WRITE_KEY;
     secretsLoaded = true;
     console.log('Secrets loaded from .env or defaults.');
   }
