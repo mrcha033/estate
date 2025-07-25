@@ -447,6 +447,25 @@ def run_seoul_apartment_etl_pipeline():
         
         pipeline_duration = (datetime.now() - pipeline_start).total_seconds()
         
+        # Step 6: Check price alert triggers after new data is processed
+        logging.info("ETL Step 6: Checking price alert triggers")
+        try:
+            # Make HTTP request to backend API to check alert triggers
+            import requests
+            backend_url = os.environ.get("BACKEND_API_URL", "http://localhost:3001")
+            alert_response = requests.post(f"{backend_url}/api/alerts/check-triggers", timeout=30)
+            
+            if alert_response.status_code == 200:
+                alert_result = alert_response.json()
+                logging.info(f"Alert check completed: {alert_result.get('message', 'No details')}")
+                pipeline_summary['alerts_checked'] = alert_result.get('total_alerts', 0)
+                pipeline_summary['alerts_triggered'] = alert_result.get('triggered_alerts', 0)
+            else:
+                logging.warning(f"Alert check failed with status {alert_response.status_code}")
+        except Exception as e:
+            logging.warning(f"Failed to check alert triggers: {e}")
+            # Don't fail the entire pipeline if alert checking fails
+        
         logging.info(f"Seoul apartment ETL pipeline completed successfully in {pipeline_duration:.2f} seconds")
         etl_tasks_processed.labels('run_seoul_apartment_etl_pipeline', 'success').inc()
         

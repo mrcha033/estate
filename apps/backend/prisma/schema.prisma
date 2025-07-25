@@ -43,3 +43,20 @@ model Report {
   s3_url      String
   createdAt   DateTime @default(now())
 }
+
+model PriceAlert {
+  id              String    @id @default(cuid())
+  district_name   String?
+  apartment_name  String?
+  price_threshold BigInt?
+  threshold_type  String    // 'above', 'below', 'change_percent'
+  change_percent  Float?
+  email           String
+  active          Boolean   @default(true)
+  created_at      DateTime  @default(now())
+  updated_at      DateTime? @updatedAt
+
+  @@index([email, active])
+  @@index([active])
+  @@map("price_alerts")
+}

@@ -35,7 +35,9 @@ export default function ReportsPage() {
 
   useEffect(() => {
     const analytics = getAnalytics();
-    analytics?.track('Report Opened');
+    if (analytics) {
+      analytics.track('Report Opened');
+    }
 
     async function fetchData() {
       try {
