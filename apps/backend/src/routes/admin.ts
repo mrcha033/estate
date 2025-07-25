@@ -111,12 +111,43 @@ export async function adminRoutes (fastify: FastifyInstance) {
       // ETL Health Status: Placeholder, as this would come from ETL service monitoring
       const etlHealthStatus = 'Operational';
 
+      // Placeholder trend data
+      const mauTrendData = [
+        { name: 'Jan', value: 120 },
+        { name: 'Feb', value: 150 },
+        { name: 'Mar', value: 170 },
+        { name: 'Apr', value: 200 },
+        { name: 'May', value: 230 },
+        { name: 'Jun', value: 250 },
+      ];
+
+      const reportOpenRateTrendData = [
+        { name: 'Jan', value: 0.35 },
+        { name: 'Feb', value: 0.40 },
+        { name: 'Mar', value: 0.42 },
+        { name: 'Apr', value: 0.45 },
+        { name: 'May', value: 0.48 },
+        { name: 'Jun', value: 0.50 },
+      ];
+
+      const sessionDurationTrendData = [
+        { name: 'Jan', value: 300 },
+        { name: 'Feb', value: 320 },
+        { name: 'Mar', value: 350 },
+        { name: 'Apr', value: 370 },
+        { name: 'May', value: 400 },
+        { name: 'Jun', value: 420 },
+      ];
+
       return {
         mau,
         totalUsers,
         reportOpenRate,
         avgSessionDuration,
         etlHealthStatus,
+        mauTrendData,
+        reportOpenRateTrendData,
+        sessionDurationTrendData,
       };
     } catch (error) {
       console.error('Error fetching KPI metrics:', error);
